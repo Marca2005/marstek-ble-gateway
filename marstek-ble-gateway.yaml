@@ -854,7 +854,7 @@ text_sensor:
 # Power Management Controls
 button:
   - platform: template
-    name: "Reboot"
+    name: "Rebot"
     id: reboot_button
     entity_category: config
     on_press:
