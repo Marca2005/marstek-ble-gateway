@@ -320,7 +320,7 @@ sensor:
 
   # Split power flow for Energy Dashboard
   - platform: template
-    name: "Battery Power In"
+    name: "Bat Power In"
     id: battery_power_in
     unit_of_measurement: "W"
     device_class: power
@@ -334,7 +334,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Battery Power Out"
+    name: "Bat Power Out"
     id: battery_power_out
     unit_of_measurement: "W"
     device_class: power
@@ -349,7 +349,7 @@ sensor:
 
   # Running total energy for HA Energy Dashboard (lifetime counters)
   - platform: integration
-    name: "Battery Energy In"
+    name: "Bat Energy In"
     id: battery_energy_in
     sensor: battery_power_in
     time_unit: h
@@ -359,7 +359,7 @@ sensor:
     restore: true
 
   - platform: integration
-    name: "Battery Energy Out"
+    name: "Bat Energy Out"
     id: battery_energy_out
     sensor: battery_power_out
     time_unit: h
@@ -370,7 +370,7 @@ sensor:
 
   # Cell voltages
   - platform: template
-    name: "Cell 1 Voltage"
+    name: "Cell 1 Volt"
     id: cell_1_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -379,7 +379,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 2 Voltage"
+    name: "Cell 2 Volt"
     id: cell_2_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -388,7 +388,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 3 Voltage"
+    name: "Cell 3 Volt"
     id: cell_3_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -397,7 +397,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 4 Voltage"
+    name: "Cell 4 Volt"
     id: cell_4_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -406,7 +406,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Cell 5 Voltage"
+    name: "Cell 5 Volt"
     id: cell_5_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -414,7 +414,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 6 Voltage"
+    name: "Cell 6 Volt"
     id: cell_6_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -422,7 +422,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 7 Voltage"
+    name: "Cell 7 Volt"
     id: cell_7_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -430,7 +430,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 8 Voltage"
+    name: "Cell 8 Volt"
     id: cell_8_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -438,7 +438,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 9 Voltage"
+    name: "Cell 9 Volt"
     id: cell_9_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -446,7 +446,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 10 Voltage"
+    name: "Cell 10 Volt"
     id: cell_10_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -454,7 +454,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 11 Voltage"
+    name: "Cell 11 Volt"
     id: cell_11_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -462,7 +462,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 12 Voltage"
+    name: "Cell 12 Volt"
     id: cell_12_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -470,7 +470,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 13 Voltage"
+    name: "Cell 13 Volt"
     id: cell_13_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -478,7 +478,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 14 Voltage"
+    name: "Cell 14 Volt"
     id: cell_14_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -486,7 +486,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 15 Voltage"
+    name: "Cell 15 Volt"
     id: cell_15_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -494,7 +494,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 16 Voltage"
+    name: "Cell 16 Volt"
     id: cell_16_voltage
     unit_of_measurement: "V"
     device_class: voltage
