@@ -106,7 +106,7 @@ globals:
     initial_value: 'false'
   - id: discovered_marstek_mac
     type: std::string
-    initial_value: '"00:00:00:00:00:00"'
+    initial_value: '"AC:D9:29:68:D6:E9"'
   - id: notify_count
     type: int
     initial_value: '0'
