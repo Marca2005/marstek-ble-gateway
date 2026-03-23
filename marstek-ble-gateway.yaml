@@ -513,28 +513,28 @@ sensor:
 
 # Additional numeric telemetry
   - platform: template
-    name: "Config Mode"
+    name: "Conf Mode"
     id: config_mode
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
 
   - platform: template
-    name: "Config Status"
+    name: "Conf Status"
     id: config_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
 
   - platform: template
-    name: "Config Value"
+    name: "Conf Value"
     id: config_value
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
 
   - platform: template
-    name: "CT Polling Rate"
+    name: "CT Polling"
     id: ct_polling_rate
     state_class: measurement
     entity_category: diagnostic
@@ -542,19 +542,19 @@ sensor:
 
 binary_sensor:
   - platform: template
-    name: "WiFi Connected"
+    name: "WiFi Con"
     id: wifi_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "MQTT Connected"
+    name: "MQTT Con"
     id: mqtt_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "BLE Connected"
+    name: "BLE Con"
     id: ble_connected
     device_class: connectivity
     entity_category: diagnostic
