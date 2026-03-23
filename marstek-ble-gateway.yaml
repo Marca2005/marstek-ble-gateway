@@ -123,7 +123,7 @@ sensor:
 
   # System data (0x0D)
   - platform: template
-    name: "System_Status"
+    name: "System Stat"
     id: system_status
     state_class: measurement
     entity_category: diagnostic
