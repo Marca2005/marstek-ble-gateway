@@ -129,15 +129,14 @@ sensor:
     state_class: measurement
     update_interval: never
     
-  # - platform: template
-    # name: "Temperature High"
-    # id: temp_high
-    # unit_of_measurement: "°C"
-    # device_class: temperature
-    # state_class: measurement
-    # update_interval: never
+  - platform: template
+    name: "Temperature High"
+    id: temp_high
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    update_interval: never
 
-  # System data (0x0D)
   - platform: template
     name: "System Status"
     id: system_status
