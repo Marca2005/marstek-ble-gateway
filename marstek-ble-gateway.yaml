@@ -572,7 +572,7 @@ binary_sensor:
     # device_class: connectivity
     
   - platform: template
-    name: "Smart Meter Connected"
+    name: "Smart Meter Con"
     id: smart_meter_connected
     device_class: connectivity
     entity_category: diagnostic
@@ -584,7 +584,7 @@ binary_sensor:
 
 text_sensor:
   - platform: template
-    name: "Battery State"
+    name: "Battery Status"
     id: battery_state
     lambda: |-
       if (isnan(id(battery_power).state)) return {"unknown"};
