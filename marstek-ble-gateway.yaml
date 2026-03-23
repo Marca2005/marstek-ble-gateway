@@ -103,7 +103,7 @@ ble_client:
 globals:
   - id: connection_status
     type: bool
-    initial_value: false
+    initial_value: 'false'
   - id: discovered_marstek_mac
     type: std::string
     initial_value: '"00:00:00:00:00:00"'
@@ -120,23 +120,8 @@ sensor:
     device_class: power
     state_class: measurement
     update_interval: never
-    
-  - platform: template
-    name: "Temperature Low"
-    id: temp_low
-    unit_of_measurement: "°C"
-    device_class: temperature
-    state_class: measurement
-    update_interval: never
-    
-  - platform: template
-    name: "Temperature High"
-    id: temp_high
-    unit_of_measurement: "°C"
-    device_class: temperature
-    state_class: measurement
-    update_interval: never
 
+  # System data (0x0D)
   - platform: template
     name: "System Status"
     id: system_status
