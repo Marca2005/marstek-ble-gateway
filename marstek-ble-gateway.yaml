@@ -166,7 +166,7 @@ sensor:
 
   # BMS Data sensors
   - platform: template
-    name: "Battery Voltage"
+    name: "Battery Vol"
     id: battery_voltage
     unit_of_measurement: "V"
     device_class: voltage
