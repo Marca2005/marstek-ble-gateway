@@ -174,7 +174,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery Current"
+    name: "Battery Curr"
     id: battery_current
     unit_of_measurement: "A"
     device_class: current
@@ -201,7 +201,7 @@ sensor:
               # return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
   - platform: template
-    name: "Battery SOH"
+    name: "Bat SOH"
     id: battery_soh
     unit_of_measurement: "%"
     state_class: measurement
