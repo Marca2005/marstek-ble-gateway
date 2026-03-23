@@ -1180,7 +1180,7 @@ select:
                   # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
                   # return frame;
   - platform: template
-    name: "CT Polling Rate"
+    name: "CT Poll Rate"
     id: ct_polling_rate_select
     entity_category: config
     options:
