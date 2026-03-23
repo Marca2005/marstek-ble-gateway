@@ -7,13 +7,13 @@
 #
 # Usage:
 # packages:
-#   marstek_ble: github://Stan-Gobien/marstek-ble-gateway/marstek-ble-gateway.yaml@main
+#   marstek_ble: github://jaapp/marstek-ble-gateway/marstek-ble-gateway.yaml@main
 
 esp32_ble_tracker:
   scan_parameters:
     active: true
-    interval: 1000ms
-    window: 100ms
+    interval: 320ms
+    window: 30ms
   on_ble_advertise:
     - then:
         - lambda: |-
@@ -42,9 +42,9 @@ esp32_ble_tracker:
             }
 
 ble_client:
-  - mac_address: "AC:D9:29:68:D6:E9"  # TODO: set to your MST_* device MAC
+  - mac_address: "00:00:00:00:00:00"  # TODO: set to your MST_* device MAC
     id: marstek_venus_e
-    auto_connect: true  # laat ESPHome automatisch reconnecten
+    auto_connect: true
     on_connect:
       then:
         - lambda: |-
@@ -59,33 +59,36 @@ ble_client:
               id(ble_last_event).publish_state("Connected");
             }
         # Kick off an initial safe read burst on connect
-        - delay: 1000ms
-        - lambda: |-
-            if(id(connection_status)) {
-              // eerste frame
+        - delay: 300ms
+        - ble_client.ble_write:
+            id: marstek_venus_e
+            service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+            characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+            value: !lambda |-
               std::vector<uint8_t> frame{0x73,0x00,0x23,0x04};
               frame[1] = (uint8_t)(frame.size()+1);
               uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-              id(marstek_venus_e).ble_write('0000ff00-0000-1000-8000-00805f9b34fb', '0000ff01-0000-1000-8000-00805f9b34fb', frame);
-            }
-        - delay: 1000ms
-        - lambda: |-
-            if(id(connection_status)) {
-              // tweede frame
+              return frame;
+        - delay: 300ms
+        - ble_client.ble_write:
+            id: marstek_venus_e
+            service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+            characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+            value: !lambda |-
               std::vector<uint8_t> frame{0x73,0x00,0x23,0x03};
               frame[1] = (uint8_t)(frame.size()+1);
               uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-              id(marstek_venus_e).ble_write('0000ff00-0000-1000-8000-00805f9b34fb', '0000ff01-0000-1000-8000-00805f9b34fb', frame);
-            }
-        - delay: 1000ms
-        - lambda: |-
-            if(id(connection_status)) {
-              // derde frame
+              return frame;
+        - delay: 300ms
+        - ble_client.ble_write:
+            id: marstek_venus_e
+            service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+            characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+            value: !lambda |-
               std::vector<uint8_t> frame{0x73,0x00,0x23,0x14};
               frame[1] = (uint8_t)(frame.size()+1);
               uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-              id(marstek_venus_e).ble_write('0000ff00-0000-1000-8000-00805f9b34fb', '0000ff01-0000-1000-8000-00805f9b34fb', frame);
-            }
+              return frame;
     on_disconnect:
       then:
         - lambda: |-
@@ -106,7 +109,7 @@ globals:
     initial_value: 'false'
   - id: discovered_marstek_mac
     type: std::string
-    initial_value: '"AC:D9:29:68:D6:E9"'
+    initial_value: '"00:00:00:00:00:00"'
   - id: notify_count
     type: int
     initial_value: '0'
@@ -114,59 +117,71 @@ globals:
 # Runtime Information sensors
 sensor:
   - platform: template
-    name: "Output1 Power"
+    name: "Output 1 Power"
     id: out1_power
     unit_of_measurement: "W"
     device_class: power
     state_class: measurement
     update_interval: never
+    
+    
+  - platform: template
+    name: "Temperature Low"
+    id: temp_low
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    update_interval: never
+    
+  - platform: template
+    name: "Temperature High"
+    id: temp_high
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    update_interval: never
 
   # System data (0x0D)
   - platform: template
-    name: "System Stat"
+    name: "System Status"
     id: system_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
-
-  # - platform: template
-    # name: "System Value 1"
-    # id: system_value_1
-    # state_class: measurement
-    # entity_category: diagnostic
-    # update_interval: never
-
-  # - platform: template
-    # name: "System Value 2"
-    # id: system_value_2
-    # state_class: measurement
-    # entity_category: diagnostic
-    # update_interval: never
-
-  # - platform: template
-    # name: "System Value 3"
-    # id: system_value_3
-    # state_class: measurement
-    # entity_category: diagnostic
-    # update_interval: never
-
-  # - platform: template
-    # name: "System Value 4"
-    # id: system_value_4
-    # state_class: measurement
-    # entity_category: diagnostic
-    # update_interval: never
-
-  # - platform: template
-    # name: "System Value 5"
-    # id: system_value_5
-    # state_class: measurement
-    # entity_category: diagnostic
-    # update_interval: never
+  - platform: template
+    name: "System Value 1"
+    id: system_value_1
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "System Value 2"
+    id: system_value_2
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "System Value 3"
+    id: system_value_3
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "System Value 4"
+    id: system_value_4
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: "System Value 5"
+    id: system_value_5
+    state_class: measurement
+    entity_category: diagnostic
+    update_interval: never
 
   # BMS Data sensors
   - platform: template
-    name: "Battery Vol"
+    name: "Battery Voltage"
     id: battery_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -174,102 +189,102 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery Curr"
+    name: "Battery Current"
     id: battery_current
     unit_of_measurement: "A"
     device_class: current
     state_class: measurement
     update_interval: never
     
-  # - platform: template
-    # name: "Battery SOC"
-    # id: battery_soc
-    # unit_of_measurement: "%"
-    # state_class: measurement
-    # update_interval: never
-    # on_value:
-      # then:
-        # - sensor.template.publish:
-            # id: remaining_capacity
-            # state: !lambda |-
-              # if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
-              # return (id(battery_soc).state / 100.0f) * id(design_capacity).state;
-        # - sensor.template.publish:
-            # id: available_capacity
-            # state: !lambda |-
-              # if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
-              # return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
+  - platform: template
+    name: "Battery SOC"
+    id: battery_soc
+    unit_of_measurement: "%"
+    state_class: measurement
+    update_interval: never
+    on_value:
+      then:
+        - sensor.template.publish:
+            id: remaining_capacity
+            state: !lambda |-
+              if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
+              return (id(battery_soc).state / 100.0f) * id(design_capacity).state;
+        - sensor.template.publish:
+            id: available_capacity
+            state: !lambda |-
+              if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
+              return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
   - platform: template
-    name: "Bat SOH"
+    name: "Battery SOH"
     id: battery_soh
     unit_of_measurement: "%"
     state_class: measurement
     update_interval: never
     
-  # - platform: template
-    # name: "Design Capacity"
-    # id: design_capacity
-    # unit_of_measurement: "Wh"
-    # device_class: energy
-    # state_class: measurement
-    # update_interval: never
-    # on_value:
-      # then:
-        # - sensor.template.publish:
-            # id: remaining_capacity
-            # state: !lambda |-
-              # if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
-              # return (id(battery_soc).state / 100.0f) * id(design_capacity).state;
-        # - sensor.template.publish:
-            # id: available_capacity
-            # state: !lambda |-
-              # if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
-              # return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
+  - platform: template
+    name: "Design Capacity"
+    id: design_capacity
+    unit_of_measurement: "Wh"
+    device_class: energy
+    state_class: measurement
+    update_interval: never
+    on_value:
+      then:
+        - sensor.template.publish:
+            id: remaining_capacity
+            state: !lambda |-
+              if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
+              return (id(battery_soc).state / 100.0f) * id(design_capacity).state;
+        - sensor.template.publish:
+            id: available_capacity
+            state: !lambda |-
+              if (isnan(id(battery_soc).state) || isnan(id(design_capacity).state)) return NAN;
+              return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
-  # - platform: template
-    # name: "Available Capacity"
-    # id: available_capacity
-    # unit_of_measurement: "Wh"
-    # device_class: energy_storage
-    # state_class: measurement
-    # lambda: |-
-      # // Calculate available capacity: (100 - SOC)% × design_capacity
-      # float soc = id(battery_soc).state;
-      # float design = id(design_capacity).state;
-      # ESP_LOGD("capacity", "Available calc: SOC=%.1f, Design=%.1f", soc, design);
-      # if (isnan(soc) || isnan(design)) {
-        # ESP_LOGW("capacity", "Available capacity: NAN values detected");
-        # return NAN;
-      # }
-      # float result = ((100.0f - soc) / 100.0f) * design;
-      # ESP_LOGD("capacity", "Available capacity calculated: %.1f Wh", result);
-      # return result;
-    # update_interval: 60s
+  - platform: template
+    name: "Available Capacity"
+    id: available_capacity
+    unit_of_measurement: "Wh"
+    device_class: energy_storage
+    state_class: measurement
+    lambda: |-
+      // Calculate available capacity: (100 - SOC)% × design_capacity
+      float soc = id(battery_soc).state;
+      float design = id(design_capacity).state;
+      ESP_LOGD("capacity", "Available calc: SOC=%.1f, Design=%.1f", soc, design);
+      if (isnan(soc) || isnan(design)) {
+        ESP_LOGW("capacity", "Available capacity: NAN values detected");
+        return NAN;
+      }
+      float result = ((100.0f - soc) / 100.0f) * design;
+      ESP_LOGD("capacity", "Available capacity calculated: %.1f Wh", result);
+      return result;
+    update_interval: 60s
     
-  # - platform: template
-    # name: "Remaining Capacity"
-    # id: remaining_capacity
-    # unit_of_measurement: "Wh"
-    # device_class: energy_storage
-    # state_class: measurement
-    # lambda: |-
-      # // Calculate remaining capacity: SOC% × design_capacity
-      # float soc = id(battery_soc).state;
-      # float design = id(design_capacity).state;
-      # ESP_LOGD("capacity", "Remaining calc: SOC=%.1f, Design=%.1f", soc, design);
-      # if (isnan(soc) || isnan(design)) {
-        # ESP_LOGW("capacity", "Remaining capacity: NAN values detected");
-        # return NAN;
-      # }
-      # float result = (soc / 100.0f) * design;
-      # ESP_LOGD("capacity", "Remaining capacity calculated: %.1f Wh", result);
-      # return result;
-    # update_interval: 60s
+  - platform: template
+    name: "Remaining Capacity"
+    id: remaining_capacity
+    unit_of_measurement: "Wh"
+    device_class: energy_storage
+    state_class: measurement
+    lambda: |-
+      // Calculate remaining capacity: SOC% × design_capacity
+      float soc = id(battery_soc).state;
+      float design = id(design_capacity).state;
+      ESP_LOGD("capacity", "Remaining calc: SOC=%.1f, Design=%.1f", soc, design);
+      if (isnan(soc) || isnan(design)) {
+        ESP_LOGW("capacity", "Remaining capacity: NAN values detected");
+        return NAN;
+      }
+      float result = (soc / 100.0f) * design;
+      ESP_LOGD("capacity", "Remaining capacity calculated: %.1f Wh", result);
+      return result;
+    update_interval: 60s
     
   # Daily Energy Tracking (ESPHome calculated)
   - platform: total_daily_energy
-    name: "Daily Bat Energy In"
+    name: "Daily Battery Energy In"
     id: daily_battery_energy_in
     power_id: battery_power_in
     unit_of_measurement: "Wh"
@@ -278,7 +293,7 @@ sensor:
     method: left
     
   - platform: total_daily_energy
-    name: "Daily Bat Energy Out"
+    name: "Daily Battery Energy Out"
     id: daily_battery_energy_out
     power_id: battery_power_out
     unit_of_measurement: "Wh"
@@ -288,27 +303,27 @@ sensor:
     
     
   # V2 Features
-  # - platform: template
-    # name: "Adaptive Power Out"
-    # id: adaptive_power_out
-    # unit_of_measurement: "W"
-    # device_class: power
-    # state_class: measurement
-    # update_interval: never
+  - platform: template
+    name: "Adaptive Power Out"
+    id: adaptive_power_out
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    update_interval: never
     
     
     
-  # - platform: template
-    # name: "Battery Temperature"
-    # id: battery_temp
-    # unit_of_measurement: "°C"
-    # device_class: temperature
-    # state_class: measurement
-    # update_interval: never
+  - platform: template
+    name: "Battery Temperature"
+    id: battery_temp
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    update_interval: never
 
   # Derived power for HA Energy Dashboard
   - platform: template
-    name: "Bat Power"
+    name: "Battery Power"
     id: battery_power
     unit_of_measurement: "W"
     device_class: power
@@ -320,7 +335,7 @@ sensor:
 
   # Split power flow for Energy Dashboard
   - platform: template
-    name: "Bat Power In"
+    name: "Battery Power In"
     id: battery_power_in
     unit_of_measurement: "W"
     device_class: power
@@ -334,7 +349,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Bat Power Out"
+    name: "Battery Power Out"
     id: battery_power_out
     unit_of_measurement: "W"
     device_class: power
@@ -349,7 +364,7 @@ sensor:
 
   # Running total energy for HA Energy Dashboard (lifetime counters)
   - platform: integration
-    name: "Bat Energy In"
+    name: "Battery Energy In"
     id: battery_energy_in
     sensor: battery_power_in
     time_unit: h
@@ -359,7 +374,7 @@ sensor:
     restore: true
 
   - platform: integration
-    name: "Bat Energy Out"
+    name: "Battery Energy Out"
     id: battery_energy_out
     sensor: battery_power_out
     time_unit: h
@@ -370,7 +385,7 @@ sensor:
 
   # Cell voltages
   - platform: template
-    name: "Cell 1 Volt"
+    name: "Cell 1 Voltage"
     id: cell_1_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -379,7 +394,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 2 Volt"
+    name: "Cell 2 Voltage"
     id: cell_2_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -388,7 +403,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 3 Volt"
+    name: "Cell 3 Voltage"
     id: cell_3_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -397,7 +412,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 4 Volt"
+    name: "Cell 4 Voltage"
     id: cell_4_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -406,7 +421,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Cell 5 Volt"
+    name: "Cell 5 Voltage"
     id: cell_5_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -414,7 +429,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 6 Volt"
+    name: "Cell 6 Voltage"
     id: cell_6_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -422,7 +437,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 7 Volt"
+    name: "Cell 7 Voltage"
     id: cell_7_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -430,7 +445,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 8 Volt"
+    name: "Cell 8 Voltage"
     id: cell_8_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -438,7 +453,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 9 Volt"
+    name: "Cell 9 Voltage"
     id: cell_9_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -446,7 +461,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 10 Volt"
+    name: "Cell 10 Voltage"
     id: cell_10_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -454,7 +469,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 11 Volt"
+    name: "Cell 11 Voltage"
     id: cell_11_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -462,7 +477,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 12 Volt"
+    name: "Cell 12 Voltage"
     id: cell_12_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -470,7 +485,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 13 Volt"
+    name: "Cell 13 Voltage"
     id: cell_13_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -478,7 +493,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 14 Volt"
+    name: "Cell 14 Voltage"
     id: cell_14_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -486,7 +501,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 15 Volt"
+    name: "Cell 15 Voltage"
     id: cell_15_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -494,7 +509,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 16 Volt"
+    name: "Cell 16 Voltage"
     id: cell_16_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -503,38 +518,35 @@ sensor:
     update_interval: never
 
   # BLE client RSSI for connection quality
-  # - platform: ble_client
-    # ble_client_id: marstek_venus_e
-    # type: rssi
-    # name: "BLE RSSI"
-    # device_class: signal_strength
-    # entity_category: diagnostic
-    # update_interval: 5s
+  - platform: ble_client
+    ble_client_id: marstek_venus_e
+    type: rssi
+    name: "BLE RSSI"
+    device_class: signal_strength
+    entity_category: diagnostic
+    update_interval: 5s
 
 # Additional numeric telemetry
   - platform: template
-    name: "Conf Mode"
+    name: "Config Mode"
     id: config_mode
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
-
   - platform: template
-    name: "Conf Status"
+    name: "Config Status"
     id: config_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
-
   - platform: template
-    name: "Conf Value"
+    name: "Config Value"
     id: config_value
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
-
   - platform: template
-    name: "CT Polling"
+    name: "CT Polling Rate"
     id: ct_polling_rate
     state_class: measurement
     entity_category: diagnostic
@@ -542,49 +554,49 @@ sensor:
 
 binary_sensor:
   - platform: template
-    name: "WiFi Con"
+    name: "WiFi Connected"
     id: wifi_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "MQTT Con"
+    name: "MQTT Connected"
     id: mqtt_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "BLE Con"
+    name: "BLE Connected"
     id: ble_connected
     device_class: connectivity
     entity_category: diagnostic
     lambda: return id(connection_status);
     
-  # - platform: template
-    # name: "Output 1 Active"
-    # id: out1_active_sensor
-    # device_class: power
-    # entity_category: diagnostic
-    
-  # - platform: template
-    # name: "External 1 Connected"
-    # id: extern1_connected
-    # device_class: connectivity
+  - platform: template
+    name: "Output 1 Active"
+    id: out1_active_sensor
+    device_class: power
+    entity_category: diagnostic
     
   - platform: template
-    name: "Smart Meter Con"
+    name: "External 1 Connected"
+    id: extern1_connected
+    device_class: connectivity
+    
+  - platform: template
+    name: "Smart Meter Connected"
     id: smart_meter_connected
     device_class: connectivity
     entity_category: diagnostic
     
     
-  # - platform: template
-    # name: "Adaptive Mode"
-    # id: adaptive_mode_status
+  - platform: template
+    name: "Adaptive Mode"
+    id: adaptive_mode_status
 
 text_sensor:
   - platform: template
-    name: "Battery Status"
+    name: "Battery State"
     id: battery_state
     lambda: |-
       if (isnan(id(battery_power).state)) return {"unknown"};
@@ -593,33 +605,33 @@ text_sensor:
       return p > 0 ? std::string("charging") : std::string("discharging");
     update_interval: never
 
-  # - platform: template
-    # name: "Device Type"
-    # id: device_type
-    # entity_category: diagnostic
+  - platform: template
+    name: "Device Type"
+    id: device_type
+    entity_category: diagnostic
     
-  # - platform: template
-    # name: "Device ID"
-    # id: device_id
-    # entity_category: diagnostic
+  - platform: template
+    name: "Device ID"
+    id: device_id
+    entity_category: diagnostic
     
-  # - platform: template
-    # name: "MAC Address"
-    # id: mac_address
-    # entity_category: diagnostic
+  - platform: template
+    name: "MAC Address"
+    id: mac_address
+    entity_category: diagnostic
     
-  # - platform: template
-    # name: "Firmware Version"
-    # id: firmware_version
-    # entity_category: diagnostic
+  - platform: template
+    name: "Firmware Version"
+    id: firmware_version
+    entity_category: diagnostic
     
-  # - platform: template
-    # name: "WiFi SSID"
-    # id: wifi_ssid
-    # entity_category: diagnostic
+  - platform: template
+    name: "WiFi SSID"
+    id: wifi_ssid
+    entity_category: diagnostic
 
   - platform: template
-    name: "Disc Marstek MAC"
+    name: "Discovered Marstek MAC"
     id: discovered_mac_display
     entity_category: diagnostic
     lambda: |-
@@ -629,23 +641,23 @@ text_sensor:
         return {"Scanning..."};
       }
 
-  # - platform: template
-    # name: "Network Info"
-    # id: network_info
-    # entity_category: diagnostic
+  - platform: template
+    name: "Network Info"
+    id: network_info
+    entity_category: diagnostic
 
   - platform: template
-    name: "Mete IP"
+    name: "Meter IP"
     id: meter_ip
     entity_category: diagnostic
 
   - platform: template
-    name: "Loc API Status"
+    name: "Local API Status"
     id: local_api_status
     entity_category: diagnostic
 
   - platform: template
-    name: "BLE Last Eve"
+    name: "BLE Last Event"
     id: ble_last_event
     internal: true
 
@@ -697,13 +709,13 @@ text_sensor:
             switch (cmd) {
               case 0x03: { // Runtime Info
                 id(out1_power).publish_state((float)u16(20));
-                //id(temp_low).publish_state(((float)s16(33)) / 10.0f);
-                //id(temp_high).publish_state(((float)s16(35)) / 10.0f);
+                id(temp_low).publish_state(((float)s16(33)) / 10.0f);
+                id(temp_high).publish_state(((float)s16(35)) / 10.0f);
                 id(wifi_connected).publish_state((u8(15) & 0x01) != 0);
                 id(mqtt_connected).publish_state((u8(15) & 0x02) != 0);
                 // Output status parsing (Venus E has only one output)
-                //id(out1_active_sensor).publish_state(u8(16) != 0);
-                //id(extern1_connected).publish_state(u8(28) != 0);
+                id(out1_active_sensor).publish_state(u8(16) != 0);
+                id(extern1_connected).publish_state(u8(28) != 0);
                 // Device capacity value at offset 22-23 ignored (unreliable)
                 // Device daily energy values ignored - using ESPHome total_daily_energy instead
                 // Raw values: bat_in=u32(40), bat_out=u32(44), load_in=u32(48), load_out=u32(52)
@@ -712,10 +724,10 @@ text_sensor:
               case 0x04: { // Device Info (ASCII key=value)
                 std::string s((const char*)p, (size_t)payload_len);
                 auto apply_kv = [&](const std::string &k, const std::string &v){
-                //  if (k == "type") id(device_type).publish_state(v);
-                //  else if (k == "id") id(device_id).publish_state(v);
-                //  else if (k == "mac") id(mac_address).publish_state(v);
-                //  else if (k == "dev_ver" || k == "fc_ver") id(firmware_version).publish_state(v);
+                  if (k == "type") id(device_type).publish_state(v);
+                  else if (k == "id") id(device_id).publish_state(v);
+                  else if (k == "mac") id(mac_address).publish_state(v);
+                  else if (k == "dev_ver" || k == "fc_ver") id(firmware_version).publish_state(v);
                 };
                 size_t start = 0;
                 while (start < s.size()) {
@@ -738,23 +750,23 @@ text_sensor:
                 break;
               }
               case 0x08: { // WiFi SSID (ASCII)
-                //std::string s((const char*)p, (size_t)payload_len);
-                //id(wifi_ssid).publish_state(s);
+                std::string s((const char*)p, (size_t)payload_len);
+                id(wifi_ssid).publish_state(s);
                 break;
               }
               case 0x0D: { // System Data - publish raw words
                 id(system_status).publish_state(u8(0));
-                //id(system_value_1).publish_state(u16(1));
-                //id(system_value_2).publish_state(u16(3));
-                //(system_value_3).publish_state(u16(5));
-                //(system_value_4).publish_state(u16(7));
-                //(system_value_5).publish_state(u16(9));
+                id(system_value_1).publish_state(u16(1));
+                id(system_value_2).publish_state(u16(3));
+                id(system_value_3).publish_state(u16(5));
+                id(system_value_4).publish_state(u16(7));
+                id(system_value_5).publish_state(u16(9));
                 break;
               }
               case 0x14: { // BMS Data
-                //id(battery_soc).publish_state((float)u16(8));
+                id(battery_soc).publish_state((float)u16(8));
                 id(battery_soh).publish_state((float)u16(10));
-                //id(design_capacity).publish_state((float)u16(12));
+                id(design_capacity).publish_state((float)u16(12));
                 float vbat = ((float)u16(14)) / 100.0f;
                 float ibat = ((float)s16(16)) / 10.0f;
                 id(battery_voltage).publish_state(vbat);
@@ -769,7 +781,7 @@ text_sensor:
                   std::string state = abs(power) < 5.0 ? "inactive" : (power > 0 ? "charging" : "discharging");
                   id(battery_state).publish_state(state);
                 }
-                //id(battery_temp).publish_state((float)u16(40));
+                id(battery_temp).publish_state((float)u16(40));
                 const int base = 48;
                 const int max_cells = 16;
                 for (int i = 0; i < max_cells; i++) {
@@ -798,14 +810,14 @@ text_sensor:
                 break;
               }
               case 0x13: { // Timer Info (V2)
-                //if (payload_len >= 45) {
+                if (payload_len >= 45) {
                   // Parse adaptive mode enabled
-                  //id(adaptive_mode_status).publish_state(u8(0) != 0);
+                  id(adaptive_mode_status).publish_state(u8(0) != 0);
                   // Timer data parsing removed
                   // Smart meter info at offset ~37
                   if (payload_len >= 43) {
                     id(smart_meter_connected).publish_state(u8(37) != 0);
-                    //id(adaptive_power_out).publish_state((float)u16(38));
+                    id(adaptive_power_out).publish_state((float)u16(38));
                     // Smart meter reading removed
                   }
                 }
@@ -832,8 +844,8 @@ text_sensor:
                 break;
               }
               case 0x24: { // Network Info (ASCII)
-                //std::string s((const char*)p, (size_t)payload_len);
-                //id(network_info).publish_state(s);
+                std::string s((const char*)p, (size_t)payload_len);
+                id(network_info).publish_state(s);
                 break;
               }
               case 0x28: { // Local API status [enabled, port_lo, port_hi]
@@ -854,7 +866,7 @@ text_sensor:
 # Power Management Controls
 button:
   - platform: template
-    name: "Rebot"
+    name: "Reboot"
     id: reboot_button
     entity_category: config
     on_press:
@@ -873,314 +885,314 @@ button:
                   return frame;
           else:
             - logger.log: "Cannot send reboot command - device not connected"
-  # - platform: template
-    # name: "Set 800W Mode"
-    # id: set_800w_mode
-    # entity_category: config
-    # on_press:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x15,0x20,0x03};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send power command - device not connected"
+  - platform: template
+    name: "Set 800W Mode"
+    id: set_800w_mode
+    entity_category: config
+    on_press:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x15,0x20,0x03};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send power command - device not connected"
 
-  # - platform: template
-    # name: "Set 2500W Mode"
-    # id: set_2500w_mode
-    # entity_category: config
-    # on_press:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x15,0xC4,0x09};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send power command - device not connected"
+  - platform: template
+    name: "Set 2500W Mode"
+    id: set_2500w_mode
+    entity_category: config
+    on_press:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x15,0xC4,0x09};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send power command - device not connected"
 
-  # - platform: template
-    # name: "Set AC Power 2500W"
-    # id: set_ac_power_2500w
-    # entity_category: config
-    # on_press:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x16,0xC4,0x09};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
+  - platform: template
+    name: "Set AC Power 2500W"
+    id: set_ac_power_2500w
+    entity_category: config
+    on_press:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x16,0xC4,0x09};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
 
-  # - platform: template
-    # name: "Set Total Power 2500W"
-    # id: set_total_power_2500w
-    # entity_category: config
-    # on_press:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x17,0xC4,0x09};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-            # return frame;
+  - platform: template
+    name: "Set Total Power 2500W"
+    id: set_total_power_2500w
+    entity_category: config
+    on_press:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x17,0xC4,0x09};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+            return frame;
 
 # System Control Switches  
-# switch:
-  # - platform: template
-    # name: "Output 1 Control"
-    # id: out1_control
-    # entity_category: config
-    # optimistic: true
-    # turn_on_action:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x0E,0x01};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send output control - device not connected"
-    # turn_off_action:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x0E,0x00};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send output control - device not connected"
+switch:
+  - platform: template
+    name: "Output 1 Control"
+    id: out1_control
+    entity_category: config
+    optimistic: true
+    turn_on_action:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x0E,0x01};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send output control - device not connected"
+    turn_off_action:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x0E,0x00};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send output control - device not connected"
             
             
             
-  # - platform: template
-    # name: "Adaptive Mode"
-    # id: adaptive_mode_switch
-    # entity_category: config
-    # optimistic: true
-    # turn_on_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x11,0x01};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-            # return frame;
-    # turn_off_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x11,0x00};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-            # return frame;
+  - platform: template
+    name: "Adaptive Mode"
+    id: adaptive_mode_switch
+    entity_category: config
+    optimistic: true
+    turn_on_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x11,0x01};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+            return frame;
+    turn_off_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x11,0x00};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+            return frame;
             
-  # - platform: template
-    # name: "EPS Mode"
-    # id: eps_mode
-    # entity_category: config
-    # optimistic: true
-    # lambda: |-
-      # return {};  // Unknown state initially
-    # turn_on_action:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x05,0x01};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send EPS command - device not connected"
-    # turn_off_action:
-      # - if:
-          # condition:
-            # lambda: 'return id(connection_status);'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x05,0x00};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-          # else:
-            # - logger.log: "Cannot send EPS command - device not connected"
+  - platform: template
+    name: "EPS Mode"
+    id: eps_mode
+    entity_category: config
+    optimistic: true
+    lambda: |-
+      return {};  // Unknown state initially
+    turn_on_action:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x05,0x01};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send EPS command - device not connected"
+    turn_off_action:
+      - if:
+          condition:
+            lambda: 'return id(connection_status);'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x05,0x00};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+          else:
+            - logger.log: "Cannot send EPS command - device not connected"
 
-  # - platform: template
-    # name: "AC Input"
-    # id: ac_input
-    # entity_category: config
-    # turn_on_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x06,0x01};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
-    # turn_off_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x06,0x00};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
+  - platform: template
+    name: "AC Input"
+    id: ac_input
+    entity_category: config
+    turn_on_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x06,0x01};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
+    turn_off_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x06,0x00};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
 
-  # - platform: template
-    # name: "Generator"
-    # id: generator
-    # entity_category: config
-    # turn_on_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x07,0x01};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
-    # turn_off_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x07,0x00};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
+  - platform: template
+    name: "Generator"
+    id: generator
+    entity_category: config
+    turn_on_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x07,0x01};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
+    turn_off_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x07,0x00};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
 
-  # - platform: template
-    # name: "Buzzer"
-    # id: buzzer
-    # entity_category: config
-    # turn_on_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x09,0x01};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
-    # turn_off_action:
-      # - ble_client.ble_write:
-          # id: marstek_venus_e
-          # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-          # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-          # value: !lambda |-
-            # std::vector<uint8_t> frame{0x73,0x00,0x23,0x09,0x00};
-            # frame[1] = (uint8_t)(frame.size()+1);
-            # uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
-            # return frame;
+  - platform: template
+    name: "Buzzer"
+    id: buzzer
+    entity_category: config
+    turn_on_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x09,0x01};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
+    turn_off_action:
+      - ble_client.ble_write:
+          id: marstek_venus_e
+          service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+          characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+          value: !lambda |-
+            std::vector<uint8_t> frame{0x73,0x00,0x23,0x09,0x00};
+            frame[1] = (uint8_t)(frame.size()+1);
+            uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
+            return frame;
 
 # Configuration Selects
 select:
-  # - platform: template
-    # name: "Charge Mode"
-    # id: charge_mode_select
-    # entity_category: config
-    # options:
-      # - "Load First"
-      # - "PV2 Passthrough"
-      # - "Simultaneous Charge Discharge"
-    # initial_option: "Load First"
-    # set_action:
-      # - if:
-          # condition:
-            # lambda: 'return x == "Load First";'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x01};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-      # - if:
-          # condition:
-            # lambda: 'return x == "PV2 Passthrough";'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x00};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
-      # - if:
-          # condition:
-            # lambda: 'return x == "Simultaneous Charge Discharge";'
-          # then:
-            # - ble_client.ble_write:
-                # id: marstek_venus_e
-                # service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
-                # characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
-                # value: !lambda |-
-                  # std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x02};
-                  # frame[1] = (uint8_t)(frame.size()+1);
-                  # uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
-                  # return frame;
   - platform: template
-    name: "CT Poll Rate"
+    name: "Charge Mode"
+    id: charge_mode_select
+    entity_category: config
+    options:
+      - "Load First"
+      - "PV2 Passthrough"
+      - "Simultaneous Charge Discharge"
+    initial_option: "Load First"
+    set_action:
+      - if:
+          condition:
+            lambda: 'return x == "Load First";'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x01};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+      - if:
+          condition:
+            lambda: 'return x == "PV2 Passthrough";'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x00};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+      - if:
+          condition:
+            lambda: 'return x == "Simultaneous Charge Discharge";'
+          then:
+            - ble_client.ble_write:
+                id: marstek_venus_e
+                service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
+                characteristic_uuid: '0000ff01-0000-1000-8000-00805f9b34fb'
+                value: !lambda |-
+                  std::vector<uint8_t> frame{0x73,0x00,0x23,0x0D,0x02};
+                  frame[1] = (uint8_t)(frame.size()+1);
+                  uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
+                  return frame;
+  - platform: template
+    name: "CT Polling Rate"
     id: ct_polling_rate_select
     entity_category: config
     options:
@@ -1232,7 +1244,7 @@ select:
 # Timed polling and watchdogs
 interval:
   # Fast loop: Runtime + BMS
-  - interval: 20s
+  - interval: 10s
     then:
       - if:
           condition:
@@ -1247,7 +1259,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 400ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1262,7 +1274,7 @@ interval:
                 ESP_LOGD("marstek", "Not connected; skipping fast poll");
 
   # Medium loop: System, WiFi, Config, CT Poll, Local API, Network, Meter IP
-  - interval: 5min
+  - interval: 60s
     then:
       - if:
           condition:
@@ -1277,7 +1289,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1287,7 +1299,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1297,7 +1309,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1307,7 +1319,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1317,7 +1329,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1327,7 +1339,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1342,7 +1354,7 @@ interval:
                 ESP_LOGD("marstek", "Not connected; skipping medium poll");
 
   # Slow loop: Error & Event logs
-  - interval: 10min
+  - interval: 5min
     then:
       - if:
           condition:
@@ -1357,7 +1369,7 @@ interval:
                   frame[1] = (uint8_t)(frame.size()+1);
                   uint8_t x=0; for(auto c:frame) x^=c; frame.push_back(x);
                   return frame;
-            - delay: 800ms
+            - delay: 300ms
             - ble_client.ble_write:
                 id: marstek_venus_e
                 service_uuid: '0000ff00-0000-1000-8000-00805f9b34fb'
@@ -1372,7 +1384,7 @@ interval:
                 ESP_LOGD("marstek", "Not connected; skipping slow poll");
 
   # Watchdog: try to connect if disconnected
-  - interval: 35s
+  - interval: 15s
     then:
       - if:
           condition:
