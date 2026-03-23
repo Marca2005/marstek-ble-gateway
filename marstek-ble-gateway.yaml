@@ -121,14 +121,13 @@ sensor:
     state_class: measurement
     update_interval: never
     
-    
-  # - platform: template
-    # name: "Temperature Low"
-    # id: temp_low
-    # unit_of_measurement: "°C"
-    # device_class: temperature
-    # state_class: measurement
-    # update_interval: never
+  - platform: template
+    name: "Temperature Low"
+    id: temp_low
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    update_interval: never
     
   # - platform: template
     # name: "Temperature High"
