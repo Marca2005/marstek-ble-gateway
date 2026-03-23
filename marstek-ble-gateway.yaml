@@ -619,7 +619,7 @@ text_sensor:
     # entity_category: diagnostic
 
   - platform: template
-    name: "Discovered Marstek MAC"
+    name: "Disc Marstek MAC"
     id: discovered_mac_display
     entity_category: diagnostic
     lambda: |-
@@ -635,17 +635,17 @@ text_sensor:
     # entity_category: diagnostic
 
   - platform: template
-    name: "Meter IP"
+    name: "Mete IP"
     id: meter_ip
     entity_category: diagnostic
 
   - platform: template
-    name: "Local API Status"
+    name: "Loc API Status"
     id: local_api_status
     entity_category: diagnostic
 
   - platform: template
-    name: "BLE Last Event"
+    name: "BLE Last Eve"
     id: ble_last_event
     internal: true
 
