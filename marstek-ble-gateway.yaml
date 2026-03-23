@@ -114,7 +114,7 @@ globals:
 # Runtime Information sensors
 sensor:
   - platform: template
-    name: "Output 1 Power"
+    name: "Output1 Power"
     id: out1_power
     unit_of_measurement: "W"
     device_class: power
