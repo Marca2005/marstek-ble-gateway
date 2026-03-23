@@ -42,7 +42,7 @@ esp32_ble_tracker:
             }
 
 ble_client:
-  - mac_address: "00:00:00:00:00:00"  # TODO: set to your MST_* device MAC
+  - mac_address: "AC:D9:29:68:D6:E9"  # TODO: set to your MST_* device MAC
     id: marstek_venus_e
     auto_connect: true
     on_connect:
