@@ -269,7 +269,7 @@ sensor:
     
   # Daily Energy Tracking (ESPHome calculated)
   - platform: total_daily_energy
-    name: "Daily Battery Energy In"
+    name: "Daily Bat Energy In"
     id: daily_battery_energy_in
     power_id: battery_power_in
     unit_of_measurement: "Wh"
@@ -278,7 +278,7 @@ sensor:
     method: left
     
   - platform: total_daily_energy
-    name: "Daily Battery Energy Out"
+    name: "Daily Bat Energy Out"
     id: daily_battery_energy_out
     power_id: battery_power_out
     unit_of_measurement: "Wh"
@@ -308,7 +308,7 @@ sensor:
 
   # Derived power for HA Energy Dashboard
   - platform: template
-    name: "Battery Power"
+    name: "Bat Power"
     id: battery_power
     unit_of_measurement: "W"
     device_class: power
