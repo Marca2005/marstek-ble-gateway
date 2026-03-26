@@ -117,7 +117,7 @@ globals:
 # Runtime Information sensors
 sensor:
   - platform: template
-    name: Output1Power
+    name: Powerout1
     id: out1_power
     unit_of_measurement: "W"
     device_class: power
@@ -126,7 +126,7 @@ sensor:
     
     
   - platform: template
-    name: "TemperatureLow"
+    name: Lowtemp
     id: temp_low
     unit_of_measurement: "°C"
     device_class: temperature
