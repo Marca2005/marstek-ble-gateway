@@ -117,7 +117,7 @@ globals:
 # Runtime Information sensors
 sensor:
   - platform: template
-#    name: "Output 1 Power"
+    name: "Output1Power"
     id: out1_power
     unit_of_measurement: "W"
     device_class: power
@@ -126,7 +126,7 @@ sensor:
     
     
   - platform: template
-    name: "Temperature Low"
+    name: "TemperatureLow"
     id: temp_low
     unit_of_measurement: "°C"
     device_class: temperature
@@ -134,7 +134,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Temperature High"
+    name: "TemperatureHigh"
     id: temp_high
     unit_of_measurement: "°C"
     device_class: temperature
@@ -143,37 +143,37 @@ sensor:
 
   # System data (0x0D)
   - platform: template
-    name: "System Status"
+    name: "SystemStatus"
     id: system_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 1"
+    name: "SystemValue1"
     id: system_value_1
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 2"
+    name: "SystemValue2"
     id: system_value_2
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 3"
+    name: "SystemValue3"
     id: system_value_3
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 4"
+    name: "SystemValue4"
     id: system_value_4
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 5"
+    name: "SystemValue5"
     id: system_value_5
     state_class: measurement
     entity_category: diagnostic
@@ -181,7 +181,7 @@ sensor:
 
   # BMS Data sensors
   - platform: template
-    name: "Battery Voltage"
+    name: "BatteryVoltage"
     id: battery_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -189,7 +189,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery Current"
+    name: "BatteryCurrent"
     id: battery_current
     unit_of_measurement: "A"
     device_class: current
@@ -197,7 +197,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery SOC"
+    name: "BatterySOC"
     id: battery_soc
     unit_of_measurement: "%"
     state_class: measurement
@@ -216,7 +216,7 @@ sensor:
               return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
   - platform: template
-    name: "Battery SOH"
+    name: "BatterySOH"
     id: battery_soh
     unit_of_measurement: "%"
     state_class: measurement
