@@ -126,7 +126,7 @@ sensor:
     
     
   - platform: template
-    name: "Temperature Low"
+#    name: "Temperature Low"
     id: temp_low
     unit_of_measurement: "°C"
     device_class: temperature
@@ -134,7 +134,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Temperature High"
+#    name: "Temperature High"
     id: temp_high
     unit_of_measurement: "°C"
     device_class: temperature
@@ -143,37 +143,37 @@ sensor:
 
   # System data (0x0D)
   - platform: template
-    name: "System Status"
+#    name: "System Status"
     id: system_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 1"
+#    name: "System Value 1"
     id: system_value_1
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 2"
+#    name: "System Value 2"
     id: system_value_2
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 3"
+#    name: "System Value 3"
     id: system_value_3
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 4"
+#    name: "System Value 4"
     id: system_value_4
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "System Value 5"
+#    name: "System Value 5"
     id: system_value_5
     state_class: measurement
     entity_category: diagnostic
@@ -181,7 +181,7 @@ sensor:
 
   # BMS Data sensors
   - platform: template
-    name: "Battery Voltage"
+#    name: "Battery Voltage"
     id: battery_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -189,7 +189,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery Current"
+#    name: "Battery Current"
     id: battery_current
     unit_of_measurement: "A"
     device_class: current
@@ -197,7 +197,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Battery SOC"
+#    name: "Battery SOC"
     id: battery_soc
     unit_of_measurement: "%"
     state_class: measurement
@@ -216,14 +216,14 @@ sensor:
               return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
   - platform: template
-    name: "Battery SOH"
+#    name: "Battery SOH"
     id: battery_soh
     unit_of_measurement: "%"
     state_class: measurement
     update_interval: never
     
   - platform: template
-    name: "Design Capacity"
+#    name: "Design Capacity"
     id: design_capacity
     unit_of_measurement: "Wh"
     device_class: energy
@@ -243,7 +243,7 @@ sensor:
               return ((100.0f - id(battery_soc).state) / 100.0f) * id(design_capacity).state;
     
   - platform: template
-    name: "Available Capacity"
+#    name: "Available Capacity"
     id: available_capacity
     unit_of_measurement: "Wh"
     device_class: energy_storage
@@ -263,7 +263,7 @@ sensor:
     update_interval: 60s
     
   - platform: template
-    name: "Remaining Capacity"
+#    name: "Remaining Capacity"
     id: remaining_capacity
     unit_of_measurement: "Wh"
     device_class: energy_storage
@@ -284,7 +284,7 @@ sensor:
     
   # Daily Energy Tracking (ESPHome calculated)
   - platform: total_daily_energy
-    name: "Daily Battery Energy In"
+#    name: "Daily Battery Energy In"
     id: daily_battery_energy_in
     power_id: battery_power_in
     unit_of_measurement: "Wh"
@@ -293,7 +293,7 @@ sensor:
     method: left
     
   - platform: total_daily_energy
-    name: "Daily Battery Energy Out"
+#    name: "Daily Battery Energy Out"
     id: daily_battery_energy_out
     power_id: battery_power_out
     unit_of_measurement: "Wh"
@@ -304,7 +304,7 @@ sensor:
     
   # V2 Features
   - platform: template
-    name: "Adaptive Power Out"
+#    name: "Adaptive Power Out"
     id: adaptive_power_out
     unit_of_measurement: "W"
     device_class: power
@@ -314,7 +314,7 @@ sensor:
     
     
   - platform: template
-    name: "Battery Temperature"
+#    name: "Battery Temperature"
     id: battery_temp
     unit_of_measurement: "°C"
     device_class: temperature
@@ -323,7 +323,7 @@ sensor:
 
   # Derived power for HA Energy Dashboard
   - platform: template
-    name: "Battery Power"
+#    name: "Battery Power"
     id: battery_power
     unit_of_measurement: "W"
     device_class: power
@@ -335,7 +335,7 @@ sensor:
 
   # Split power flow for Energy Dashboard
   - platform: template
-    name: "Battery Power In"
+#    name: "Battery Power In"
     id: battery_power_in
     unit_of_measurement: "W"
     device_class: power
@@ -349,7 +349,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Battery Power Out"
+#    name: "Battery Power Out"
     id: battery_power_out
     unit_of_measurement: "W"
     device_class: power
@@ -364,7 +364,7 @@ sensor:
 
   # Running total energy for HA Energy Dashboard (lifetime counters)
   - platform: integration
-    name: "Battery Energy In"
+#    name: "Battery Energy In"
     id: battery_energy_in
     sensor: battery_power_in
     time_unit: h
@@ -374,7 +374,7 @@ sensor:
     restore: true
 
   - platform: integration
-    name: "Battery Energy Out"
+#    name: "Battery Energy Out"
     id: battery_energy_out
     sensor: battery_power_out
     time_unit: h
@@ -385,7 +385,7 @@ sensor:
 
   # Cell voltages
   - platform: template
-    name: "Cell 1 Voltage"
+#    name: "Cell 1 Voltage"
     id: cell_1_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -394,7 +394,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 2 Voltage"
+#    name: "Cell 2 Voltage"
     id: cell_2_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -403,7 +403,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 3 Voltage"
+#    name: "Cell 3 Voltage"
     id: cell_3_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -412,7 +412,7 @@ sensor:
     update_interval: never
     
   - platform: template
-    name: "Cell 4 Voltage"
+#    name: "Cell 4 Voltage"
     id: cell_4_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -421,7 +421,7 @@ sensor:
     update_interval: never
 
   - platform: template
-    name: "Cell 5 Voltage"
+#    name: "Cell 5 Voltage"
     id: cell_5_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -429,7 +429,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 6 Voltage"
+#    name: "Cell 6 Voltage"
     id: cell_6_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -437,7 +437,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 7 Voltage"
+#    name: "Cell 7 Voltage"
     id: cell_7_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -445,7 +445,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 8 Voltage"
+#    name: "Cell 8 Voltage"
     id: cell_8_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -453,7 +453,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 9 Voltage"
+#    name: "Cell 9 Voltage"
     id: cell_9_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -461,7 +461,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 10 Voltage"
+#    name: "Cell 10 Voltage"
     id: cell_10_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -469,7 +469,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 11 Voltage"
+#    name: "Cell 11 Voltage"
     id: cell_11_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -477,7 +477,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 12 Voltage"
+#    name: "Cell 12 Voltage"
     id: cell_12_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -485,7 +485,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 13 Voltage"
+#    name: "Cell 13 Voltage"
     id: cell_13_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -493,7 +493,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 14 Voltage"
+#    name: "Cell 14 Voltage"
     id: cell_14_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -501,7 +501,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 15 Voltage"
+#    name: "Cell 15 Voltage"
     id: cell_15_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -509,7 +509,7 @@ sensor:
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Cell 16 Voltage"
+#    name: "Cell 16 Voltage"
     id: cell_16_voltage
     unit_of_measurement: "V"
     device_class: voltage
@@ -528,25 +528,25 @@ sensor:
 
 # Additional numeric telemetry
   - platform: template
-    name: "Config Mode"
+#    name: "Config Mode"
     id: config_mode
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Config Status"
+#    name: "Config Status"
     id: config_status
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "Config Value"
+#    name: "Config Value"
     id: config_value
     state_class: measurement
     entity_category: diagnostic
     update_interval: never
   - platform: template
-    name: "CT Polling Rate"
+#    name: "CT Polling Rate"
     id: ct_polling_rate
     state_class: measurement
     entity_category: diagnostic
@@ -554,49 +554,49 @@ sensor:
 
 binary_sensor:
   - platform: template
-    name: "WiFi Connected"
+#    name: "WiFi Connected"
     id: wifi_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "MQTT Connected"
+#    name: "MQTT Connected"
     id: mqtt_connected
     device_class: connectivity
     entity_category: diagnostic
     
   - platform: template
-    name: "BLE Connected"
+#    name: "BLE Connected"
     id: ble_connected
     device_class: connectivity
     entity_category: diagnostic
     lambda: return id(connection_status);
     
   - platform: template
-    name: "Output 1 Active"
+#    name: "Output 1 Active"
     id: out1_active_sensor
     device_class: power
     entity_category: diagnostic
     
   - platform: template
-    name: "External 1 Connected"
+#    name: "External 1 Connected"
     id: extern1_connected
     device_class: connectivity
     
   - platform: template
-    name: "Smart Meter Connected"
+#    name: "Smart Meter Connected"
     id: smart_meter_connected
     device_class: connectivity
     entity_category: diagnostic
     
     
   - platform: template
-    name: "Adaptive Mode"
+#    name: "Adaptive Mode"
     id: adaptive_mode_status
 
 text_sensor:
   - platform: template
-    name: "Battery State"
+#    name: "Battery State"
     id: battery_state
     lambda: |-
       if (isnan(id(battery_power).state)) return {"unknown"};
@@ -606,32 +606,32 @@ text_sensor:
     update_interval: never
 
   - platform: template
-    name: "Device Type"
+#    name: "Device Type"
     id: device_type
     entity_category: diagnostic
     
   - platform: template
-    name: "Device ID"
+#    name: "Device ID"
     id: device_id
     entity_category: diagnostic
     
   - platform: template
-    name: "MAC Address"
+#    name: "MAC Address"
     id: mac_address
     entity_category: diagnostic
     
   - platform: template
-    name: "Firmware Version"
+#    name: "Firmware Version"
     id: firmware_version
     entity_category: diagnostic
     
   - platform: template
-    name: "WiFi SSID"
+#    name: "WiFi SSID"
     id: wifi_ssid
     entity_category: diagnostic
 
   - platform: template
-    name: "Discovered Marstek MAC"
+#    name: "Discovered Marstek MAC"
     id: discovered_mac_display
     entity_category: diagnostic
     lambda: |-
@@ -642,22 +642,22 @@ text_sensor:
       }
 
   - platform: template
-    name: "Network Info"
+#    name: "Network Info"
     id: network_info
     entity_category: diagnostic
 
   - platform: template
-    name: "Meter IP"
+#    name: "Meter IP"
     id: meter_ip
     entity_category: diagnostic
 
   - platform: template
-    name: "Local API Status"
+#    name: "Local API Status"
     id: local_api_status
     entity_category: diagnostic
 
   - platform: template
-    name: "BLE Last Event"
+#    name: "BLE Last Event"
     id: ble_last_event
     internal: true
 
@@ -866,7 +866,7 @@ text_sensor:
 # Power Management Controls
 button:
   - platform: template
-    name: "Reboot"
+#    name: "Reboot"
     id: reboot_button
     entity_category: config
     on_press:
@@ -886,7 +886,7 @@ button:
           else:
             - logger.log: "Cannot send reboot command - device not connected"
   - platform: template
-    name: "Set 800W Mode"
+#    name: "Set 800W Mode"
     id: set_800w_mode
     entity_category: config
     on_press:
@@ -907,7 +907,7 @@ button:
             - logger.log: "Cannot send power command - device not connected"
 
   - platform: template
-    name: "Set 2500W Mode"
+#    name: "Set 2500W Mode"
     id: set_2500w_mode
     entity_category: config
     on_press:
@@ -928,7 +928,7 @@ button:
             - logger.log: "Cannot send power command - device not connected"
 
   - platform: template
-    name: "Set AC Power 2500W"
+#    name: "Set AC Power 2500W"
     id: set_ac_power_2500w
     entity_category: config
     on_press:
@@ -943,7 +943,7 @@ button:
             return frame;
 
   - platform: template
-    name: "Set Total Power 2500W"
+#    name: "Set Total Power 2500W"
     id: set_total_power_2500w
     entity_category: config
     on_press:
@@ -960,7 +960,7 @@ button:
 # System Control Switches  
 switch:
   - platform: template
-    name: "Output 1 Control"
+#    name: "Output 1 Control"
     id: out1_control
     entity_category: config
     optimistic: true
@@ -1000,7 +1000,7 @@ switch:
             
             
   - platform: template
-    name: "Adaptive Mode"
+#    name: "Adaptive Mode"
     id: adaptive_mode_switch
     entity_category: config
     optimistic: true
@@ -1026,7 +1026,7 @@ switch:
             return frame;
             
   - platform: template
-    name: "EPS Mode"
+#    name: "EPS Mode"
     id: eps_mode
     entity_category: config
     optimistic: true
@@ -1066,7 +1066,7 @@ switch:
             - logger.log: "Cannot send EPS command - device not connected"
 
   - platform: template
-    name: "AC Input"
+#    name: "AC Input"
     id: ac_input
     entity_category: config
     turn_on_action:
@@ -1091,7 +1091,7 @@ switch:
             return frame;
 
   - platform: template
-    name: "Generator"
+#    name: "Generator"
     id: generator
     entity_category: config
     turn_on_action:
@@ -1116,7 +1116,7 @@ switch:
             return frame;
 
   - platform: template
-    name: "Buzzer"
+#    name: "Buzzer"
     id: buzzer
     entity_category: config
     turn_on_action:
@@ -1143,7 +1143,7 @@ switch:
 # Configuration Selects
 select:
   - platform: template
-    name: "Charge Mode"
+#    name: "Charge Mode"
     id: charge_mode_select
     entity_category: config
     options:
@@ -1192,7 +1192,7 @@ select:
                   uint8_t checksum=0; for(auto c:frame) checksum^=c; frame.push_back(checksum);
                   return frame;
   - platform: template
-    name: "CT Polling Rate"
+#    name: "CT Polling Rate"
     id: ct_polling_rate_select
     entity_category: config
     options:
